@@ -1,0 +1,67 @@
+# configs/default.yaml
+# Master config for the AutoEIT pipeline
+
+preprocessing:
+  target_sample_rate: 16000          # Hz — required by Whisper
+  target_channels: 1                 # mono
+  noise_reduction:
+    enabled: true
+    stationary: true                 # works well for room noise
+    prop_decrease: 0.8               # how aggressively to reduce noise (0-1)
+  silence_trimming:
+    enabled: true
+    top_db: 30                       # dBFS threshold below which is "silence"
+    frame_length: 2048
+    hop_length: 512
+  normalization:
+    enabled: true
+    target_lufs: -23.0               # EBU R128 broadcast loudness standard
+  segmentation:
+    enabled: false                   # set true if recordings have multiple items
+    min_silence_len_ms: 800
+    silence_thresh_db: -40
+
+asr:
+  model_name: "openai/whisper-small" # start small, upgrade to medium/large later
+  language: "es"                     # Spanish
+  task: "transcribe"
+  fine_tune:
+    enabled: false                   # set true once you have labelled data
+    train_manifest: "data/splits/train.csv"
+    val_manifest: "data/splits/val.csv"
+    output_dir: "models/whisper-eit-finetuned"
+    num_train_epochs: 10
+    per_device_train_batch_size: 8
+    learning_rate: 1.0e-5
+    warmup_steps: 500
+    gradient_checkpointing: true
+    fp16: true
+  inference:
+    beam_size: 5
+    best_of: 5
+    temperature: 0.0
+    condition_on_previous_text: false  # better for short EIT responses
+    word_timestamps: true
+
+postprocessing:
+  lm_rescoring:
+    enabled: false                   # future phase
+  punctuation_restoration:
+    enabled: true
+  custom_lexicon_path: "configs/eit_lexicon.txt"
+  lowercase: true
+  strip_filler_words: true           # um, uh, eh — common in learner speech
+  filler_words: ["um", "uh", "eh", "hmm", "ah"]
+
+evaluation:
+  metrics:
+    - wer                            # Word Error Rate
+    - cer                            # Character Error Rate
+    - human_agreement                # % exact match with human transcriber
+  human_transcripts_path: "data/transcripts/human_reference.csv"
+  output_report: "outputs/evaluation_report.json"
+
+pipeline:
+  log_level: "INFO"
+  save_intermediate: true            # save processed audio + raw ASR output
+  output_format: "csv"               # csv or json
