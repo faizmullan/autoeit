@@ -1,3 +1,10 @@
+![GSoC 2026](https://img.shields.io/badge/GSoC-2026-4285F4?logo=google&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white)
+![Tests](https://img.shields.io/badge/Tests-20%2F20%20passing-brightgreen)
+![WER](https://img.shields.io/badge/WER-4.3%25-blue)
+
+
 # AutoEIT — Audio-to-Text Transcription for L2 Learner Data
 
 > **GSoC 2026 Project** | HumanAI Foundation | Applicant: Faiz Mullan
